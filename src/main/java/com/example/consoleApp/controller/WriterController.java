@@ -27,20 +27,54 @@ public class WriterController {
         System.out.println("Writers sohraneni");
     }
 
+//    public void deleteWriter(Long id) {
+//        List<Writer> writersList = writerRepository.getAll();
+//
+//        for(int i = 0; i < writersList.size(); i++) {
+//           Writer writer = writersList.get(i);
+//
+//           if(writer.getId().equals(id)) {
+//               writer.setStatus(Status.DELETED);
+//               writerRepository.save(writer);
+////               System.out.println("Index ydalennogo writera " + id);
+//               return;
+//           }
+//        }
+////        System.out.println("Writer ne naiden s indeksom " + id);
+//    }
     public void deleteWriter(Long id) {
         List<Writer> writersList = writerRepository.getAll();
 
-        for(int i = 0; i < writersList.size(); i++) {
-           Writer writer = writersList.get(i);
+        for(int i = 0; i <writersList.size(); i++) {
+            Writer writer = writersList.get(i);
 
-           if(writer.getId().equals(id)) {
-               writer.setStatus(Status.DELETED);
-               writerRepository.save(writer);
-//               System.out.println("Index ydalennogo writera " + id);
-               return;
-           }
+            if(writer.getId().equals(id)) {
+                writer.setStatus(Status.DELETED);
+                writerRepository.saveAll(writersList);
+                System.out.println("Writer with id " + id + " pome4en na Ydalenie");
+                return;
+            }
         }
-//        System.out.println("Writer ne naiden s indeksom " + id);
+        System.out.println("Writer with id " + id + " not found");
 
     }
+
+//    public void updateWriter(Long id, String firstName, String lastName, Status) {
+//        List<Writer> writerList = writerRepository.getAll();
+//
+//        for (Writer writer : writerList) {
+//
+//            if(writer.getId().equals(id)) {
+//                writer.setFirstName(firstName);
+//                writer.setLastName(lastName);
+//                writer.setStatus(Status.ACTIVE);
+//
+//                ((GsonWriterRepositoryImp) writerRepository).writeToFile(writerList);
+//                System.out.println("Writer updated: " + writer.getFirstName() + " " + writer.getLastName() + " " + writer.getStatus());
+//                return;
+//            }
+//        }
+//        System.out.println("Writer with id: " + id + " not found.");
+//    }
+
 }
