@@ -11,7 +11,7 @@ Console app
 Как запустить?
 1. Установить Java 17+
 2. Склонировать из репозитория:
-git clone https://github.com/Pavel29502/SportApp.git
+git clone https://github.com/Pavel29502/ConsoleApp
 3. Запустить Main.java в IDE
 
 Использованные технологии:
