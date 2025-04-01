@@ -1,5 +1,4 @@
 package com.example.consoleApp.model;
-
 import java.util.List;
 
 public class Post {
