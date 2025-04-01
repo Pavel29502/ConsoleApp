@@ -1,9 +1,7 @@
 package com.example.consoleApp.controller;
-
 import com.example.consoleApp.model.Label;
 import com.example.consoleApp.model.Post;
 import com.example.consoleApp.model.Status;
-import com.example.consoleApp.repository.Gson.GsonPostRepositoryImpl;
 import com.example.consoleApp.repository.LabelRepository;
 import com.example.consoleApp.repository.PostRepository;
 import java.util.List;
@@ -26,60 +24,40 @@ public class PostController {
         Post post = new Post(id, title, content, labels, Status.ACTIVE);
         postRepository.save(post);
         System.out.println("Post saved " + post.getTitle());
-
-    }
-
-    public void deletePost(Long id) {
-        List<Post> posts = postRepository.getAll();
-
-        boolean found = false;
-        for (Post post : posts) {
-            if (post.getId().equals(id)) {
-                post.setStatus(Status.DELETED);
-                found = true;
-                break;
-            }
-        }
-        if (found) {
-            ((GsonPostRepositoryImpl) postRepository).update(posts);
-            System.out.println(" Post with id " + id + " deleted");
-        } else {
-            System.out.println(" Post with id " + id + " deleted");
-        }
     }
 
     public void showAllPosts() {
         postRepository.getAll().forEach(System.out::println);
     }
 
-    public void updatePost(Long id ,String title, String content, Status status, List<Long> labelId) {
-        List<Post> posts = postRepository.getAll();
-        boolean updated = false;
-
-        for (Post post : posts) {
-            if(post.getId().equals(id)) {
-                post.setTitle(title);
-                post.setContent(content);
-                post.setStatus(status);
-//                updated = true;
-//                break;
-                List<Label> updatedLabels = labelRepository.getAll().stream()
-                        .filter(label -> labelId.contains(label.getId()))
-                        .collect(Collectors.toList());
-                post.setLabels(updatedLabels);
-
-                updated = true;
-                break;
-            }
-        }
-
-        if (updated) {
-            ((GsonPostRepositoryImpl) postRepository).update(posts);
-//            postRepository.save(posts);
-            System.out.println("Writer with id " + id + " updated");
-        } else {
-            System.out.println("Writer with id " + id + " not found");
-        }
+    public List<Post> getAllPosts() {
+        return postRepository.getAll();
     }
 
+    public void updatePost(Long id, String title, String content, List<Long> labelIds, Status status) {
+        postRepository.getAll().stream()
+                .filter(post -> post.getId().equals(id))
+                .findFirst()
+                .ifPresent(post -> {
+                    post.setTitle(title);
+                    post.setContent(content);
+                    post.setStatus(status);
+                    post.setLabels(labelRepository.getAll().stream()
+                            .filter(label -> labelIds.contains(label.getId()))
+                            .collect(Collectors.toList()));
+                    postRepository.update(post);
+                    System.out.println("Post updated with id " + id);
+                });
+    }
+
+    public void deletePost(Long id) {
+        postRepository.getAll().stream()
+                .filter(post -> post.getId().equals(id))
+                .findFirst()
+                .ifPresent(post -> {
+                    post.setStatus(Status.DELETED);
+                    postRepository.update(post);
+                    System.out.println("Post deleted with id " + id);
+                });
+    }
 }

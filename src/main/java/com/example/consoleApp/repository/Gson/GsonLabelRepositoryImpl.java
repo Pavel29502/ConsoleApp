@@ -1,5 +1,4 @@
 package com.example.consoleApp.repository.Gson;
-
 import com.example.consoleApp.model.Label;
 import com.example.consoleApp.repository.LabelRepository;
 import com.google.gson.Gson;
@@ -29,9 +28,10 @@ public class GsonLabelRepositoryImpl implements LabelRepository {
         try {
             String json = Files.readString(filePath).trim();
             if (json.isEmpty()) return new ArrayList<>();
-            List<Label> labels = gson.fromJson(json, new TypeToken<List<Label>>() {}.getType());
+            List<Label> labels = gson.fromJson(json, new TypeToken<List<Label>>() {
+            }.getType());
             return labels != null ? labels : new ArrayList<>();
-         } catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return new ArrayList<>();
         }
@@ -57,9 +57,15 @@ public class GsonLabelRepositoryImpl implements LabelRepository {
         return getAllLabelsInternal();
     }
 
-    public void update(List<Label> labels) {
-        writeToFile(labels);
+    public void update(Label label) {
+        List<Label> labels = getAllLabelsInternal();
+        labels.stream()
+                .filter(l -> l.getId().equals(label.getId()))
+                .findFirst()
+                .ifPresent(existingLabel -> {
+                    existingLabel.setName(label.getName());
+                    existingLabel.setStatus(label.getStatus());
+                    writeToFile(labels);
+                });
     }
-
-
 }

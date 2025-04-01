@@ -1,6 +1,4 @@
 package com.example.consoleApp.repository.Gson;
-
-import com.example.consoleApp.model.Status;
 import com.example.consoleApp.model.Writer;
 import com.example.consoleApp.repository.WriterRepository;
 import com.google.gson.Gson;
@@ -27,22 +25,23 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
     private List<Writer> getAllWritersInternal() {
         Path fPath = Paths.get(file);
 
-        if(!Files.exists(fPath)) {
+        if (!Files.exists(fPath)) {
             return new ArrayList<>();
         }
 
         try {
             String json = Files.readString(fPath).trim();
 
-            if(json.isEmpty()) {
+            if (json.isEmpty()) {
                 return new ArrayList<>();
             }
 
-            List<Writer> writers = gson.fromJson(json, new TypeToken<List<Writer>>() {}.getType());
+            List<Writer> writers = gson.fromJson(json, new TypeToken<List<Writer>>() {
+            }.getType());
             return writers != null ? writers : new ArrayList<>();
         } catch (IOException e) {
             e.printStackTrace();
-            return  new ArrayList<>();
+            return new ArrayList<>();
         }
     }
 
@@ -63,11 +62,19 @@ public class GsonWriterRepositoryImpl implements WriterRepository {
     public List<Writer> getAll() {
         return getAllWritersInternal()
                 .stream()
-//                .filter(w -> w.getStatus().equals(Status.ACTIVE))
                 .toList();
     }
 
-    public void update(List<Writer> writers) {
-        writeToFile(writers);
+    public void update(Writer writer) {
+        List<Writer> writers = getAllWritersInternal();
+        writers.stream()
+                .filter(w -> w.getId().equals(writer.getId()))
+                .findFirst()
+                .ifPresent(existingWriter -> {
+                    existingWriter.setFirstName(writer.getFirstName());
+                    existingWriter.setLastName(writer.getLastName());
+                    existingWriter.setStatus(writer.getStatus());
+                    writeToFile(writers);
+                });
     }
 }

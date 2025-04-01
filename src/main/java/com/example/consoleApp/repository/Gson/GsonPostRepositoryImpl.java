@@ -1,5 +1,4 @@
 package com.example.consoleApp.repository.Gson;
-
 import com.example.consoleApp.model.Post;
 import com.example.consoleApp.repository.PostRepository;
 import com.google.gson.Gson;
@@ -18,7 +17,7 @@ public class GsonPostRepositoryImpl implements PostRepository {
     private List<Post> getAllPostInternal() {
         Path fPath = Paths.get(postFile);
 
-        if(!Files.exists(fPath)) {
+        if (!Files.exists(fPath)) {
             return new ArrayList<>();
         }
 
@@ -29,7 +28,8 @@ public class GsonPostRepositoryImpl implements PostRepository {
                 return new ArrayList<>();
             }
 
-            List<Post> posts = gson.fromJson(json, new TypeToken<List<Post>>() {}.getType());
+            List<Post> posts = gson.fromJson(json, new TypeToken<List<Post>>() {
+            }.getType());
             return posts != null ? posts : new ArrayList<>();
         } catch (IOException e) {
             e.printStackTrace();
@@ -60,10 +60,20 @@ public class GsonPostRepositoryImpl implements PostRepository {
         post.setId(getMxId(posts));
         posts.add(post);
         writeToFile(posts);
-     }
+    }
 
-     public void update(List<Post> posts) {
-        writeToFile(posts);
-     }
+    public void update(Post post) {
+        List<Post> posts = getAllPostInternal();
+        posts.stream()
+                .filter(p -> p.getId().equals(post.getId()))
+                .findFirst()
+                .ifPresent(existingPost -> {
+                    existingPost.setTitle(post.getTitle());
+                    existingPost.setContent(post.getContent());
+                    existingPost.setStatus(post.getStatus());
+                    existingPost.setLabels(post.getLabels());
+                    writeToFile(posts);
+                });
+    }
 }
 
